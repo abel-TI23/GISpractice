@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>Assignment 3: Coordinate Systems Comparison</title>
     <style>
         * {
@@ -326,5 +327,102 @@
             <p>📍 Center Location: Sukabumi, West Java (-6.905, 106.874)</p>
         </div>
     </div>
+=======
+    <title>map_1</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+  <div id = "map"></div>
+  <style>
+    #map { height: 500px; width: 100%; }
+  </style>  
+    <script>
+    // Create a map centered at specific coordinates with a given zoom level
+    var map = L.map("map").setView([-6.9053877997992, 106.87356135956009],17);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    // Add a marker with a popup
+    var markerData = [
+        {lat:-6.905526632682002, lng:	106.87460693244734, popup:'Home'},
+        {lat:-6.905371637991479,lng:106.87354867030655, popup:'campus'},
+        {lat:-6.902595997614433, lng:106.88374813225745, popup:'Vos Bakery'}
+    ];
+        
+    markerData.forEach(function(item) {
+        L.marker([item.lat, item.lng]).addTo(map).bindPopup(item.popup);
+    });
+    // Adding  lines/polylines
+    var coordinates = [
+        [-6.902596640188506, 106.88374819329681], //vos
+        [-6.9053877997992, 106.87356135956009], //nusa putra
+        [-6.905526632682002, 106.87460693244734] //home
+        
+        
+    ];
+    var line = L.polyline(coordinates, {
+        color: 'green',
+        weight: 2,
+    }).addTo(map);
+
+    // Adding polygons
+    var corners = [
+        [-6.905521677411528, 106.87383568225783],
+        [-6.904833465852192, 106.87372693873033], 
+        [-6.9047659940766835, 106.87320134501283], 
+        [-6.905616137743223, 106.87317415913208] 
+    ];
+    var polygon = L.polygon(corners,{
+        color: 'purple',
+        fillColor: 'lightblue',
+        fillOpacity: 0.5,
+    }).addTo(map);
+
+    // Adding GeoJSON data
+    var geoJsonData = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {
+                    "name": "my home"
+                },
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [106.87460693244734,-6.905526632682002]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {
+                    "name": "NusaPutra Campus"
+                },
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [106.87354867030655, -6.905371637991479]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {
+                    "name": "Vos the Bakery"
+                },
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [106.88374813225745, -6.902595997614433]
+                }
+            }
+        ]
+    };
+
+    L.geoJSON(geoJsonData, {
+        onEachFeature: function (feature, layer) {
+            if (feature.properties && feature.properties.name) {
+                layer.bindPopup("<strong>" + feature.properties.name + "</strong>");
+            }
+        }
+    }).addTo(map);
+   </script>
+  
+>>>>>>> 08a14d70876218133da1c0cf0675dbc7b03cfc35
 </body>
 </html>
