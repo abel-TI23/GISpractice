@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Mercator Map (EPSG:3857)</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        #map {
+            height: 600px;
+            width: 100%;
+            border: 3px solid #3498db;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .info-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            border-left: 5px solid #3498db;
+        }
+        .coordinate-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(52, 152, 219, 0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .navigation {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .nav-button {
+            background: #e74c3c;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .nav-button:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌍 Web Mercator Map (EPSG:3857)</h1>
+        
+        <div class="navigation">
+            <a href="epsg4326-map.html" class="nav-button">Switch to EPSG:4326 Map →</a>
+        </div>
+        
+        <div id="map"></div>
+        
+        <div class="coordinate-display" id="coord-display">
+            Click on map to see coordinates
+        </div>
+        
+        <div class="info-panel">
+            <h3>📍 Web Mercator Projection (EPSG:3857)</h3>
+            <ul>
+                <li><strong>Used by:</strong> Google Maps, OpenStreetMap, most web mapping services</li>
+                <li><strong>Advantages:</strong> Fast rendering, preserves shapes locally, good for navigation</li>
+                <li><strong>Disadvantages:</strong> Distorts areas significantly near poles</li>
+                <li><strong>Coordinate System:</strong> Projected coordinates in meters</li>
+                <li><strong>Coverage:</strong> Best for areas between 85°N and 85°S latitude</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Create Web Mercator map (EPSG:3857) - Default Leaflet
+        var map = L.map('map').setView([-6.9053877997992, 106.87356135956009], 16);
+        
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Project data
+        var projectData = [
+            {lat: -6.905526632682002, lng: 106.87460693244734, popup: '🏠 Home', color: 'blue'},
+            {lat: -6.905371637991479, lng: 106.87354867030655, popup: '🎓 NusaPutra Campus', color: 'green'},
+            {lat: -6.902595997614433, lng: 106.88374813225745, popup: '🍞 Vos Bakery', color: 'orange'}
+        ];
+
+        // Add markers
+        projectData.forEach(function(item) {
+            var marker = L.marker([item.lat, item.lng]);
+            marker.bindPopup(item.popup + '<br><small>Web Mercator Projection</small>');
+            marker.addTo(map);
+        });
+
+        // Add route
+        var route = L.polyline([
+            [-6.902596640188506, 106.88374819329681],
+            [-6.9053877997992, 106.87356135956009],
+            [-6.905526632682002, 106.87460693244734]
+        ], {
+            color: 'green',
+            weight: 4,
+            opacity: 0.8
+        });
+        route.bindPopup('🚶‍♂️ Walking Route (Web Mercator)');
+        route.addTo(map);
+
+        // Add campus area
+        var campus = L.polygon([
+            [-6.905521677411528, 106.87383568225783],
+            [-6.904833465852192, 106.87372693873033], 
+            [-6.9047659940766835, 106.87320134501283], 
+            [-6.905616137743223, 106.87317415913208] 
+        ], {
+            color: 'purple',
+            fillColor: 'lightblue',
+            fillOpacity: 0.3,
+            weight: 2
+        });
+        campus.bindPopup('🎓 Campus Area (Web Mercator)');
+        campus.addTo(map);
+
+        // GeoJSON Emergency Clinic
+        var emergencyClinic = {
+            "type": "FeatureCollection",
+            "features": [{
+                "type": "Feature",
+                "properties": {
+                    "name": "Emergency Medical Clinic",
+                    "type": "Healthcare Facility",
+                    "projection": "Web Mercator (EPSG:3857)"
+                },
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [106.87500000000000, -6.904500000000000]
+                }
+            }]
+        };
+
+        L.geoJSON(emergencyClinic, {
+            pointToLayer: function(feature, latlng) {
+                return L.marker(latlng, {
+                    icon: L.divIcon({
+                        className: 'emergency-icon',
+                        html: '🏥',
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 15]
+                    })
+                });
+            },
+            onEachFeature: function(feature, layer) {
+                layer.bindPopup(
+                    "<strong>🏥 " + feature.properties.name + "</strong><br>" +
+                    "Type: " + feature.properties.type + "<br>" +
+                    "Projection: " + feature.properties.projection
+                );
+            }
+        }).addTo(map);
+
+        // Click event for coordinates
+        map.on('click', function(e) {
+            var lat = e.latlng.lat.toFixed(6);
+            var lng = e.latlng.lng.toFixed(6);
+            
+            document.getElementById('coord-display').innerHTML = 
+                '<strong>Web Mercator Coordinates:</strong><br>' +
+                'Latitude: ' + lat + '<br>' +
+                'Longitude: ' + lng + '<br>' +
+                '<small>EPSG:3857</small>';
+        });
+
+        // Add scale control
+        L.control.scale({
+            position: 'bottomright',
+            metric: true,
+            imperial: false
+        }).addTo(map);
+
+        console.log("🌍 Web Mercator Map (EPSG:3857) loaded successfully!");
+    </script>
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment 3: Coordinate Systems Comparison</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .map-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .map-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .map-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        
+        .map-card.mercator {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        }
+        
+        .map-card.epsg4326 {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+        }
+        
+        .map-card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .map-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .map-description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .map-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: inline-block;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .map-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        .features-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .feature-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .feature-item h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        @media (max-width: 768px) {
+            .map-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗺️ Assignment 3: Coordinate Systems Comparison</h1>
+            <p>Exploring Web Mercator (EPSG:3857) vs Geographic WGS84 (EPSG:4326)</p>
+        </div>
+        
+        <div class="content">
+            <div class="map-grid">
+                <div class="map-card mercator">
+                    <span class="map-icon">🌍</span>
+                    <h2>Web Mercator (EPSG:3857)</h2>
+                    <div class="map-description">
+                        The standard projection used by Google Maps, OpenStreetMap, and most web mapping services. 
+                        Preserves shapes locally and is optimized for web display and navigation.
+                    </div>
+                    <a href="mercator-map.html" class="map-button">View Web Mercator Map</a>
+                </div>
+                
+                <div class="map-card epsg4326">
+                    <span class="map-icon">🌐</span>
+                    <h2>Geographic WGS84 (EPSG:4326)</h2>
+                    <div class="map-description">
+                        Pure latitude/longitude coordinate system used by GPS and global datasets. 
+                        No coordinate distortion but may appear visually stretched.
+                    </div>
+                    <a href="epsg4326-map.html" class="map-button">View EPSG:4326 Map</a>
+                </div>
+            </div>
+            
+            <div class="features-section">
+                <h2>🎯 Map Features</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <h4>📍 Location Data</h4>
+                        <ul>
+                            <li>🏠 Home residence</li>
+                            <li>🎓 NusaPutra Campus</li>
+                            <li>🍞 Vos Bakery</li>
+                            <li>🏥 Emergency Medical Clinic (GeoJSON)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <h4>🗺️ Vector Data</h4>
+                        <ul>
+                            <li>Markers with custom popups</li>
+                            <li>Walking route (polyline)</li>
+                            <li>Campus area boundary (polygon)</li>
+                            <li>Interactive coordinate display</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <h4>⚡ Interactive Features</h4>
+                        <ul>
+                            <li>Click to see coordinates</li>
+                            <li>Popup information windows</li>
+                            <li>Scale controls</li>
+                            <li>Navigation between projections</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <h4>📊 Educational Value</h4>
+                        <ul>
+                            <li>Coordinate system comparison</li>
+                            <li>Projection differences</li>
+                            <li>Real-world applications</li>
+                            <li>Technical implementation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="features-section">
+                <h2>📊 Coordinate Systems Comparison</h2>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Web Mercator (EPSG:3857)</th>
+                            <th>Geographic WGS84 (EPSG:4326)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Coordinate Units</strong></td>
+                            <td>Meters from equator</td>
+                            <td>Decimal degrees</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Usage</strong></td>
+                            <td>Web mapping, navigation</td>
+                            <td>GPS, global datasets</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Appearance</strong></td>
+                            <td>Normal rectangular</td>
+                            <td>May appear stretched</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Distortion</strong></td>
+                            <td>Area distortion at poles</td>
+                            <td>Visual stretching only</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Best For</strong></td>
+                            <td>Local analysis, web maps</td>
+                            <td>Global analysis, coordinates</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Coverage</strong></td>
+                            <td>85°N to 85°S</td>
+                            <td>Global (90°N to 90°S)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="features-section">
+                <h2>🎓 Learning Objectives</h2>
+                <p>This assignment demonstrates:</p>
+                <ul style="margin-top: 15px; line-height: 1.8;">
+                    <li><strong>Coordinate System Understanding:</strong> Learn the differences between projected and geographic coordinate systems</li>
+                    <li><strong>Practical Implementation:</strong> See how to implement different projections in web mapping</li>
+                    <li><strong>Real-world Applications:</strong> Understand when to use each coordinate system</li>
+                    <li><strong>Technical Skills:</strong> Experience with Leaflet, Proj4, and coordinate transformations</li>
+                    <li><strong>Data Integration:</strong> Working with points, lines, polygons, and GeoJSON data</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Assignment 3 - GIS Practice | Coordinate Systems Comparison</p>
+            <p>📍 Center Location: Sukabumi, West Java (-6.905, 106.874)</p>
+        </div>
+    </div>
+</body>
+</html>

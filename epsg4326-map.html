@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPSG:4326 Map (Geographic WGS84)</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Proj4 for coordinate transformations -->
+    <script src="https://unpkg.com/proj4@2.8.0/dist/proj4.js"></script>
+    <script src="https://unpkg.com/proj4leaflet@1.0.2/src/proj4leaflet.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0fff0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            background: linear-gradient(135deg, #27ae60, #229954);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        #map {
+            height: 600px;
+            width: 100%;
+            border: 3px solid #27ae60;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .info-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            border-left: 5px solid #27ae60;
+        }
+        .coordinate-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(39, 174, 96, 0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .navigation {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .nav-button {
+            background: #3498db;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .nav-button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 EPSG:4326 Map (Geographic WGS84)</h1>
+        
+        <div class="navigation">
+            <a href="mercator-map.html" class="nav-button">← Switch to Web Mercator Map</a>
+        </div>
+        
+        <div class="warning">
+            <strong>⚠️ Note:</strong> EPSG:4326 uses a "plate carrée" projection which may look stretched. This is normal for geographic coordinate systems.
+        </div>
+        
+        <div id="map"></div>
+        
+        <div class="coordinate-display" id="coord-display">
+            Click on map to see coordinates
+        </div>
+        
+        <div class="info-panel">
+            <h3>🌐 Geographic Projection (EPSG:4326)</h3>
+            <ul>
+                <li><strong>Also known as:</strong> WGS84, Lat/Lon, Geographic Coordinate System</li>
+                <li><strong>Advantages:</strong> No distortion of coordinate values, global coverage, simple lat/lon</li>
+                <li><strong>Disadvantages:</strong> Distorted visual appearance, not conformal</li>
+                <li><strong>Coordinate System:</strong> Decimal degrees (latitude, longitude)</li>
+                <li><strong>Usage:</strong> GPS, global datasets, coordinate storage</li>
+                <li><strong>Appearance:</strong> May look "stretched" horizontally - this is normal!</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Define EPSG:4326 CRS (Coordinate Reference System)
+        var crs4326 = new L.Proj.CRS('EPSG:4326',
+            '+proj=longlat +datum=WGS84 +no_defs',
+            {
+                resolutions: [
+                    0.703125, 0.3515625, 0.17578125, 0.087890625,
+                    0.0439453125, 0.02197265625, 0.010986328125,
+                    0.0054931640625, 0.00274658203125, 0.001373291015625,
+                    0.0006866455078125, 0.00034332275390625, 0.000171661376953125,
+                    0.0000858306884765625, 0.00004291534423828125, 0.000021457672119140625
+                ],
+                origin: [-180, 90],
+                bounds: L.bounds([-180, -90], [180, 90])
+            }
+        );
+
+        // Create EPSG:4326 map
+        var map = L.map('map', {
+            crs: crs4326,
+            center: [-6.9053877997992, 106.87356135956009],
+            zoom: 10,
+            maxZoom: 15
+        });
+
+        // Add tile layer - using WMS service that supports EPSG:4326
+        // Option 1: OpenStreetMap WMS (better for EPSG:4326)
+        var wmsLayer = L.tileLayer.wms('https://ows.terrestris.de/osm/service', {
+            layers: 'OSM-WMS',
+            format: 'image/png',
+            transparent: false,
+            crs: crs4326,
+            attribution: '© OpenStreetMap contributors, Terrestris'
+        }).addTo(map);
+
+        // Option 2: Alternative - CartoDB Light (uncomment to try)
+        /*
+        var cartoLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors, © CARTO',
+            maxZoom: 15
+        }).addTo(map);
+        */
+
+        // Option 3: Alternative - Stamen Terrain (uncomment to try)
+        /*
+        var stamenLayer = L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png', {
+            attribution: '© Stamen Design, © OpenStreetMap contributors',
+            maxZoom: 15
+        }).addTo(map);
+        */
+
+        // Project data - same coordinates work in both projections
+        var projectData = [
+            {lat: -6.905526632682002, lng: 106.87460693244734, popup: '🏠 Home', color: 'blue'},
+            {lat: -6.905371637991479, lng: 106.87354867030655, popup: '🎓 NusaPutra Campus', color: 'green'},
+            {lat: -6.902595997614433, lng: 106.88374813225745, popup: '🍞 Vos Bakery', color: 'orange'}
+        ];
+
+        // Add markers
+        projectData.forEach(function(item) {
+            var marker = L.marker([item.lat, item.lng]);
+            marker.bindPopup(item.popup + '<br><small>EPSG:4326 Projection</small>');
+            marker.addTo(map);
+        });
+
+        // Add route
+        var route = L.polyline([
+            [-6.902596640188506, 106.88374819329681],
+            [-6.9053877997992, 106.87356135956009],
+            [-6.905526632682002, 106.87460693244734]
+        ], {
+            color: 'green',
+            weight: 4,
+            opacity: 0.8
+        });
+        route.bindPopup('🚶‍♂️ Walking Route (EPSG:4326)');
+        route.addTo(map);
+
+        // Add campus area
+        var campus = L.polygon([
+            [-6.905521677411528, 106.87383568225783],
+            [-6.904833465852192, 106.87372693873033], 
+            [-6.9047659940766835, 106.87320134501283], 
+            [-6.905616137743223, 106.87317415913208] 
+        ], {
+            color: 'purple',
+            fillColor: 'lightblue',
+            fillOpacity: 0.3,
+            weight: 2
+        });
+        campus.bindPopup('🎓 Campus Area (EPSG:4326)');
+        campus.addTo(map);
+
+        // GeoJSON Emergency Clinic
+        var emergencyClinic = {
+            "type": "FeatureCollection",
+            "features": [{
+                "type": "Feature",
+                "properties": {
+                    "name": "Emergency Medical Clinic",
+                    "type": "Healthcare Facility",
+                    "projection": "Geographic WGS84 (EPSG:4326)"
+                },
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [106.87500000000000, -6.904500000000000]
+                }
+            }]
+        };
+
+        L.geoJSON(emergencyClinic, {
+            pointToLayer: function(feature, latlng) {
+                return L.marker(latlng, {
+                    icon: L.divIcon({
+                        className: 'emergency-icon',
+                        html: '🏥',
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 15]
+                    })
+                });
+            },
+            onEachFeature: function(feature, layer) {
+                layer.bindPopup(
+                    "<strong>🏥 " + feature.properties.name + "</strong><br>" +
+                    "Type: " + feature.properties.type + "<br>" +
+                    "Projection: " + feature.properties.projection
+                );
+            }
+        }).addTo(map);
+
+        // Click event for coordinates
+        map.on('click', function(e) {
+            var lat = e.latlng.lat.toFixed(6);
+            var lng = e.latlng.lng.toFixed(6);
+            
+            document.getElementById('coord-display').innerHTML = 
+                '<strong>EPSG:4326 Coordinates:</strong><br>' +
+                'Latitude: ' + lat + '°<br>' +
+                'Longitude: ' + lng + '°<br>' +
+                '<small>WGS84 Geographic</small>';
+        });
+
+        // Add scale control
+        L.control.scale({
+            position: 'bottomright',
+            metric: true,
+            imperial: false
+        }).addTo(map);
+
+        console.log("🌐 EPSG:4326 Map loaded successfully!");
+        console.log("Note: The map may appear stretched horizontally - this is normal for EPSG:4326");
+    </script>
+</body>
+</html>
